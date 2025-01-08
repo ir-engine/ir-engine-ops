@@ -9,6 +9,7 @@ controller:
     certManager:
       enabled: false
   config:
+    annotations-risk-level: "Critical"
     ssl-redirect: "false"
     server-snippet: |
       listen 8000;
