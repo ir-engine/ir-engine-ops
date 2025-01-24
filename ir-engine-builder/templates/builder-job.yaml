@@ -23,7 +23,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "ir-engine.builder.serviceAccountName" . }}
+      serviceAccountName: k8s-sql-ksa
       securityContext:
         {{- toYaml .Values.builder.podSecurityContext | nindent 8 }}
       {{- $releaseName := .Release.Name }}
@@ -48,51 +48,23 @@ spec:
             - name: SERVE_CLIENT_FROM_API
               value: "true"
             {{ end }}
-            {{ if .Values.sql }}
             - name: MYSQL_USER
-              value: {{ .Values.sql.user }}
-            - name: MYSQL_DATABASE
-              value: {{ .Values.sql.database }}
-            - name: MYSQL_PASSWORD
-              value: {{ .Values.sql.password | quote }}
-            - name: MYSQL_HOST
-              value: {{ .Values.sql.host | quote }}
-            - name: MYSQL_PORT
-              value: {{ .Values.sql.port | quote }}
-            {{ else if .Values.mariadb }}
-            - name: MYSQL_USER
-              value: {{ .Values.mariadb.db.user }}
-            - name: MYSQL_DATABASE
-              value: {{ .Values.mariadb.db.name }}
-            - name: MYSQL_PASSWORD
-              {{- if not .Values.mariadb.enabled }}
-              value: {{ .Values.mariadb.db.password | quote }}
-              {{- else }}
               valueFrom:
                 secretKeyRef:
-                  {{- if .Values.mariadb.existingSecret }}
-                  name: {{ .Values.mariadb.existingSecret }}
-                  {{- else }}
-                  name: {{ template "ir-engine.mariadb.fullname" . }}
-                  {{- end }}
-                  key: mariadb-password
-              {{- end }}
-            - name: MYSQL_HOST
-              value: {{ .Values.mariadb.externalHost }}
-            - name: MYSQL_PORT
-              value: {{ .Values.mariadb.externalPort | quote }}
-            {{ else }}
-            - name: MYSQL_USER
-              value: server
-            - name: MYSQL_DATABASE
-              value: ir-engine
+                  name: mysql-user
+                  key: username
             - name: MYSQL_PASSWORD
-              value: password
-            - name: MYSQL_HOST
-              value: host.minikube.internal
-            - name: MYSQL_PORT
-              value: 3306
-            {{ end }}
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-password
+                  key: password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-database
+                  key: database    
+            - name: AUTH_SECRET 
+              value: "test"        
             - name: REDIS_ENABLED
               value: "true"
             - name: REDIS_ADDRESS
@@ -145,6 +117,44 @@ spec:
           volumeMounts:
             - name: dind-storage
               mountPath: /var/lib/docker
+      initContainers:
+        - name: cloud-sql-proxy
+          restartPolicy: Always
+          # It is recommended to use the latest version of the Cloud SQL Auth Proxy
+          # Make sure to update on a regular schedule!
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
+          args:
+            # If connecting from a VPC-native GKE cluster, you can use the
+            # following flag to have the proxy connect over private IP
+            - "--private-ip"
+
+            # Enable structured logging with LogEntry format:
+            - "--structured-logs"
+
+            # Replace DB_PORT with the port the proxy should listen on
+            - "--port=3306"
+            - "ir-engine-dev:us-central1:ir-engine-mt-mysql-dev"
+
+          securityContext:
+            # The default Cloud SQL Auth Proxy image runs as the
+            # "nonroot" user and group (uid: 65532) by default.
+            runAsNonRoot: true
+          # You should use resource requests/limits as a best practice to prevent
+          # pods from consuming too many resources and affecting the execution of
+          # other pods. You should adjust the following values based on what your
+          # application needs. For details, see
+          # https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+          resources:
+            requests:
+              # The proxy's memory use scales linearly with the number of active
+              # connections. Fewer open connections will use less memory. Adjust
+              # this value based on your application's requirements.
+              memory: "2Gi"
+              # The proxy's CPU use scales linearly with the amount of IO between
+              # the database and the application. Adjust this value based on your
+              # application's requirements.
+              cpu: "1"
+
       volumes:
       - name: dind-storage
         emptyDir: {}
