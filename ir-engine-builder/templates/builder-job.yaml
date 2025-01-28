@@ -23,7 +23,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: k8s-sql-ksa
+      serviceAccountName: k8s-mysql-ksa
       securityContext:
         {{- toYaml .Values.builder.podSecurityContext | nindent 8 }}
       {{- $releaseName := .Release.Name }}
@@ -48,23 +48,29 @@ spec:
             - name: SERVE_CLIENT_FROM_API
               value: "true"
             {{ end }}
+            {{ if .Values.sql }}
             - name: MYSQL_USER
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-user
-                  key: username
-            - name: MYSQL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-password
-                  key: password
+              value: {{ .Values.sql.user }}
             - name: MYSQL_DATABASE
-              valueFrom:
-                secretKeyRef:
-                  name: mysql-database
-                  key: database    
-            - name: AUTH_SECRET 
-              value: "test"        
+              value: {{ .Values.sql.database }}
+            - name: MYSQL_PASSWORD
+              value: {{ .Values.sql.password | quote }}
+            - name: MYSQL_HOST
+              value: "127.0.0.1"
+            - name: MYSQL_PORT
+              value: {{ .Values.sql.port | quote }}
+            {{ else }}
+            - name: MYSQL_USER
+              value: server
+            - name: MYSQL_DATABASE
+              value: ir-engine
+            - name: MYSQL_PASSWORD
+              value: password
+            - name: MYSQL_HOST
+              value: host.minikube.internal
+            - name: MYSQL_PORT
+              value: 3306
+            {{ end }}
             - name: REDIS_ENABLED
               value: "true"
             - name: REDIS_ADDRESS
@@ -82,6 +88,8 @@ spec:
               value: tcp://localhost:2376
             - name: DOCKER_TLS_VERIFY
               value: "1"
+            - name: DESTINATION_REPO_PROVIDER
+              value: "gcp"
             - name: TAG
               value: {{ .Values.builder.image.tag }}
           ports:

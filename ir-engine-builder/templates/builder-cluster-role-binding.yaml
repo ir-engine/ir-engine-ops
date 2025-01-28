@@ -7,7 +7,7 @@ metadata:
     {{- include "ir-engine.builder.labels" . | nindent 4 }}
 subjects:
   - kind: ServiceAccount
-    name: {{ include "ir-engine.builder.serviceAccountName" . }}
+    name: k8s-mysql-ksa
     namespace: default
 roleRef:
   apiGroup: rbac.authorization.k8s.io
