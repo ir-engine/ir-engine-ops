@@ -12,6 +12,7 @@ rules:
       - pods
       - endpoints
       - deployments
+      - secrets
     verbs:
       - get
       - list
