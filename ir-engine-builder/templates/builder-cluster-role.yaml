@@ -15,6 +15,7 @@ rules:
       - secrets
       - serviceaccounts
       - configmaps
+      - clusterroles
       - services
     verbs:
       - get
