@@ -13,6 +13,9 @@ rules:
       - endpoints
       - deployments
       - secrets
+      - serviceaccounts
+      - configmaps
+      - services
     verbs:
       - get
       - list
@@ -47,4 +50,33 @@ rules:
       - get
       - list
       - watch
+      - patch
+  - apiGroups:
+      - "autoscaling.agones.dev"
+    resources:
+      - "fleetautoscalers"
+    verbs:
+      - get
+      - patch
+  - apiGroups:
+      - "rbac.authorization.k8s.io"
+    resources:
+      - clusterroles
+      - clusterrolebindings
+    verbs:
+      - get
+      - list
+  - apiGroups:
+      - "batch"
+    resources:
+      - "cronjobs"
+    verbs:
+      - get
+      - patch
+  - apiGroups:
+      - "networking.k8s.io"
+    resources:
+      - "ingresses"
+    verbs:
+      - "get"
 {{- end }}
