@@ -4,6 +4,9 @@
 
 domain: ir-engine.dev
 
+gke:
+  namespace: "" # Overridden by the helm-deploy step in ir-engine-devops-gcp github actions workflows 
+
 builder:
   enabled: true
   name: ir-engine-builder
