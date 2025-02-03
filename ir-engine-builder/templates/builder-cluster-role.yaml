@@ -4,7 +4,7 @@ kind: ClusterRole
 metadata:
   name: {{ include "ir-engine.builder.fullname" . }}
   labels:
-    {{- include "ir-engine.builder.labels" . | nindent 4 }}
+    {{- include "ir-engine.builder.labels" . | nindent 4 }}  
 rules:
   - apiGroups:
       - ""
@@ -71,9 +71,11 @@ rules:
       - "batch"
     resources:
       - "cronjobs"
+      - "jobs"
     verbs:
       - get
       - patch
+      - list
   - apiGroups:
       - "networking.k8s.io"
     resources:
