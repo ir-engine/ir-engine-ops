@@ -3,9 +3,6 @@
 # Declare variables to be passed into your templates.
 
 domain: ir-engine.dev
-namespace: "" # Overridden by the helm-deploy step in ir-engine-devops-gcp github actions workflows 
-gcp:
-  project: ""
 
 builder:
   enabled: true
