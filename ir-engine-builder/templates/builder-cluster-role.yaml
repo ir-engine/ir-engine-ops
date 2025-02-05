@@ -26,7 +26,7 @@ rules:
       - update
       - delete
   - apiGroups:
-      - "apps"
+      - apps
     resources:
       - deployments
     verbs:
@@ -38,7 +38,7 @@ rules:
       - update
       - delete
   - apiGroups:
-      - "agones.dev"
+      - agones.dev
     resources:
       - fleets
       - fleet
@@ -53,14 +53,14 @@ rules:
       - watch
       - patch
   - apiGroups:
-      - "autoscaling.agones.dev"
+      - autoscaling.agones.dev
     resources:
-      - "fleetautoscalers"
+      - fleetautoscalers
     verbs:
       - get
       - patch
   - apiGroups:
-      - "rbac.authorization.k8s.io"
+      - rbac.authorization.k8s.io
     resources:
       - clusterroles
       - clusterrolebindings
@@ -69,19 +69,19 @@ rules:
       - list
       - patch 
   - apiGroups:
-      - "batch"
+      - batch
     resources:
-      - "cronjobs"
-      - "jobs"
+      - cronjobs
+      - jobs
     verbs:
       - get
       - patch
       - list
   - apiGroups:
-      - "networking.k8s.io"
+      - networking.k8s.io
     resources:
-      - "ingresses"
+      - ingresses
     verbs:
-      - "get"
-      - "patch"
+      - get
+      - patch
 {{- end }}
