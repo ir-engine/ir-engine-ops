@@ -67,6 +67,7 @@ rules:
     verbs:
       - get
       - list
+      - patch 
   - apiGroups:
       - "batch"
     resources:
@@ -82,4 +83,5 @@ rules:
       - "ingresses"
     verbs:
       - "get"
+      - "patch"
 {{- end }}
