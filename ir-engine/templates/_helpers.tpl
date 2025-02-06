@@ -352,6 +352,16 @@ Create the name of the service account to use
 {{- end -}}
 {{- end -}}
 
+{{/*
+Create the name of the service account to use for batchinvalidator
+*/}}
+{{- define "ir-engine.batchinvalidator.serviceAccountName" -}}
+{{- if .Values.batchinvalidator.serviceAccount.create -}}
+    {{ default (include "ir-engine.batchinvalidator.fullname" .) .Values.batchinvalidator.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.batchinvalidator.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
 
 {{/*
 Create a default fully qualified app name.
