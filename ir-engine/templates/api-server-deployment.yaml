@@ -29,6 +29,15 @@ spec:
       {{- $releaseName = .Values.release.name | default .Release.Name }}
       {{ end }}
       containers:
+        - name: cloud-sql-proxy
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
+          args:
+            - "--private-ip"
+            - "--structured-logs"
+            - "--port=3306"
+            - "{{ .Release.Namespace }}:us-central1:ir-engine-mysql-dev"
+          securityContext:
+            runAsNonRoot: true
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.api.securityContext | nindent 12 }}
