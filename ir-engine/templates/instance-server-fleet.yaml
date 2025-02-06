@@ -58,6 +58,8 @@ spec:
         {{- end }}
     # InstanceServer specification
     spec:
+      # Specifies the game server container for Agones when running multiple containers in the pod
+      container: {{ include "ir-engine.instanceserver.fullname" . }}
       ports:
         - name: default
           portPolicy: Dynamic
