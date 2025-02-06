@@ -50,7 +50,9 @@ spec:
                 {{ end }}
               command: [
                 'npx',
-                'vite-node',
+                'cross-env',
+                'ts-node',
+                '--swc',
                 'scripts/run-batch-invalidation.ts'
               ]
           restartPolicy: Never
