@@ -23,7 +23,7 @@ spec:
                 - "--private-ip"
                 - "--structured-logs"
                 - "--port=3306"
-                - "{{ .Release.Namespace }}:us-central1:ir-engine-mysql-dev"
+                - "{{ .Release.Namespace }}:us-central1:{{ .Release.Namespace }}-mysql"
               securityContext:
                 runAsNonRoot: true
           {{- end}}
