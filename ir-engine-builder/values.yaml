@@ -6,7 +6,9 @@ domain: ir-engine.dev
 
 # If `cloudProvider=gcp`, initialize cloud auth proxy containers for mySQL.
 cloudProvider: aws 
-googleProjectID: "" # Utilized to set the project for the mySQL cloud auth proxy
+# Utilized to set the project for the mySQL cloud auth proxy. The value will be
+# set by the `deploy-ir-engine.yml` and `deploy-multi-tenancy.yml` helm upgrade steps 
+googleProjectID: "" 
 
 builder:
   enabled: true

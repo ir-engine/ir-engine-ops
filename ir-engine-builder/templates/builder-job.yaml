@@ -114,6 +114,8 @@ spec:
               value: {{ .Values.cloudProvider }}
             - name: NAMESPACE
               value: {{ .Release.Namespace | default "default" }}
+            - name: GOOGLE_PROJECT_ID
+              value: {{ .Values.googleProjectID }}
             - name: TAG
               value: {{ .Values.builder.image.tag }}
           ports:
