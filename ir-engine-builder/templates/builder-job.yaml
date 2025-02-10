@@ -23,7 +23,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: k8s-mysql-ksa
+      serviceAccountName: {{ include "ir-engine.builder.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.builder.podSecurityContext | nindent 8 }}
       {{- $releaseName := .Release.Name }}
@@ -127,6 +127,7 @@ spec:
           volumeMounts:
             - name: dind-storage
               mountPath: /var/lib/docker
+      {{- if eq .Values.cloudProvider "gcp" }}
       initContainers:
         - name: cloud-sql-proxy
           restartPolicy: Always
@@ -164,6 +165,7 @@ spec:
               # the database and the application. Adjust this value based on your
               # application's requirements.
               cpu: "1"
+      {{- end }}  
 
       volumes:
       - name: dind-storage
@@ -181,11 +183,3 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
 {{- end }}
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: k8s-mysql-ksa
-  namespace: {{ .Release.Namespace }}
-  annotations:
-    iam.gke.io/gcp-service-account: gke-builder-sa@ir-engine-dev.iam.gserviceaccount.com

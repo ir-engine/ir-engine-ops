@@ -3,10 +3,11 @@
 # Declare variables to be passed into your templates.
 
 domain: ir-engine.dev
+cloudProvider: gcp 
 
 builder:
   enabled: true
-  name: ir-engine-builder
+  name: ir-engine-builder  
 
   replicaCount: 1
   image:
@@ -38,7 +39,7 @@ builder:
 
   serviceAccount:
     create: true
-    annotations: {}
+    annotations: {}      
     name:
 
   resources: {}
