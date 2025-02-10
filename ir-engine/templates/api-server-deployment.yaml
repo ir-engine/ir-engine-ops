@@ -163,7 +163,8 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ $releaseName }}-redis
-                  key: redis-password                  
+                  key: redis-password      
+        {{- if eq .Values.cloudProvider "gcp" }}            
         - name: cloud-sql-proxy
           restartPolicy: Always # Indicates a special type of sidecar, which will last for the entire lifecycle of the pod 
           image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
@@ -174,6 +175,7 @@ spec:
             - "{{ .Release.Namespace }}:us-central1:ir-engine-mysql-dev"
           securityContext:
             runAsNonRoot: true
+        {{- end}}
       {{- with .Values.api.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

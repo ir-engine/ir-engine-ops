@@ -14,6 +14,7 @@ spec:
       template:
         spec:
           serviceAccountName: {{ include "ir-engine.batchinvalidator.serviceAccountName" . }}
+          {{- if eq .Values.cloudProvider "gcp" }}
           initContainers:
             - name: cloud-sql-proxy
               restartPolicy: Always # Indicates a special type of sidecar, which will last for the entire lifecycle of the pod 
@@ -25,6 +26,7 @@ spec:
                 - "{{ .Release.Namespace }}:us-central1:ir-engine-mysql-dev"
               securityContext:
                 runAsNonRoot: true
+          {{- end}}
           containers:              
             - name: batch-invalidator
               image: "{{ .Values.batchinvalidator.image.repository }}:{{ .Values.batchinvalidator.image.tag }}"
