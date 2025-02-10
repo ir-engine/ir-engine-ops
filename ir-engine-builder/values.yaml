@@ -3,7 +3,6 @@
 # Declare variables to be passed into your templates.
 
 domain: ir-engine.dev
-cloudProvider: gcp 
 
 builder:
   enabled: true
