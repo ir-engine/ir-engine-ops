@@ -165,8 +165,8 @@ spec:
             - "--structured-logs"
 
             # Replace DB_PORT with the port the proxy should listen on
-            - "--port=3306"
-            - "ir-engine-dev:us-central1:ir-engine-mysql-dev"
+            - "--port=3306"            
+            - "{{ .Values.googleProjectID }}:us-central1:{{ .Release.Namespace }}-mysql"
 
           securityContext:
             # The default Cloud SQL Auth Proxy image runs as the
