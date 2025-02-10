@@ -114,10 +114,12 @@ spec:
               value: {{ .Values.cloudProvider }}
             - name: NAMESPACE
               value: {{ .Release.Namespace | default "default" }}
-            - name: GOOGLE_PROJECT_ID
-              value: {{ .Values.googleProjectID }}
             - name: TAG
               value: {{ .Values.builder.image.tag }}
+            {{- if eq .Values.cloudProvider "gcp" }}
+            - name: GOOGLE_PROJECT_ID            
+              value: {{ .Values.googleProjectID }}
+            {{- end}}
           ports:
             - name: http
               containerPort: 3030
