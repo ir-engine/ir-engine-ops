@@ -110,8 +110,8 @@ spec:
               value: tcp://localhost:2376
             - name: DOCKER_TLS_VERIFY
               value: "1"
-            - name: GKE_NAMESPACE
-              value: {{ .Release.Namespace }}
+            - name: NAMESPACE
+              value: {{ .Release.Namespace | default "default" }}
             - name: TAG
               value: {{ .Values.builder.image.tag }}
           ports:
