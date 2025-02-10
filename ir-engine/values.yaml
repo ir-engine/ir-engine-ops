@@ -5,6 +5,12 @@
 domain: ir-engine.dev
 cloudProvider: aws 
 
+# Utilized to set the project for the mySQL cloud auth proxy. 
+# The value will be set by in the `ir-engine-builder` helm chart during 
+# `deploy-ir-engine.yml` and `deploy-multi-tenancy.yml` helm upgrade steps. 
+# The value will then be passed to the ir-engine helm chart during `deploy.sh` 
+googleProjectID: ""
+
 # This is used to define cluster environment type. Currently its used when deployed in local environment.
 # For Minikube set this as "minikube"
 # For Microk8s set this as "microk8s"
