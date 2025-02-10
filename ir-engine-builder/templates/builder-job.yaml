@@ -110,6 +110,8 @@ spec:
               value: tcp://localhost:2376
             - name: DOCKER_TLS_VERIFY
               value: "1"
+            - name: CLOUD_PROVIDER 
+              value: {{ .Values.cloudProvider }}
             - name: NAMESPACE
               value: {{ .Release.Namespace | default "default" }}
             - name: TAG
