@@ -3,6 +3,7 @@
 # Declare variables to be passed into your templates.
 
 domain: ir-engine.dev
+cloudProvider: aws 
 
 # This is used to define cluster environment type. Currently its used when deployed in local environment.
 # For Minikube set this as "minikube"

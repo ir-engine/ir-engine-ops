@@ -13,7 +13,21 @@ spec:
       parallelism: 1
       template:
         spec:
-          containers:
+          serviceAccountName: {{ include "ir-engine.batchinvalidator.serviceAccountName" . }}
+          {{- if eq .Values.cloudProvider "gcp" }}
+          initContainers:
+            - name: cloud-sql-proxy
+              restartPolicy: Always # Indicates a special type of sidecar, which will last for the entire lifecycle of the pod 
+              image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
+              args:
+                - "--private-ip"
+                - "--structured-logs"
+                - "--port=3306"
+                - "{{ .Release.Namespace }}:us-central1:ir-engine-mysql-dev"
+              securityContext:
+                runAsNonRoot: true
+          {{- end}}
+          containers:              
             - name: batch-invalidator
               image: "{{ .Values.batchinvalidator.image.repository }}:{{ .Values.batchinvalidator.image.tag }}"
               envFrom:

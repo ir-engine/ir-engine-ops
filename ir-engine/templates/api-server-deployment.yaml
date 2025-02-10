@@ -28,7 +28,7 @@ spec:
       {{ if not (empty .Values.release) }}
       {{- $releaseName = .Values.release.name | default .Release.Name }}
       {{ end }}
-      containers:
+      containers:        
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.api.securityContext | nindent 12 }}
@@ -163,7 +163,19 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: {{ $releaseName }}-redis
-                  key: redis-password
+                  key: redis-password      
+        {{- if eq .Values.cloudProvider "gcp" }}            
+        - name: cloud-sql-proxy
+          restartPolicy: Always # Indicates a special type of sidecar, which will last for the entire lifecycle of the pod 
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
+          args:
+            - "--private-ip"
+            - "--structured-logs"
+            - "--port=3306"
+            - "{{ .Release.Namespace }}:us-central1:ir-engine-mysql-dev"
+          securityContext:
+            runAsNonRoot: true
+        {{- end}}
       {{- with .Values.api.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -177,3 +189,27 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
 {{- end }}
+---
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: lb-test
+  namespace: ir-engine-dev
+spec:
+  default:
+    checkIntervalSec: 15
+    timeoutSec: 5
+    healthyThreshold: 1
+    unhealthyThreshold: 1
+    logConfig:
+      enabled: true
+    config:
+      type: HTTP
+      httpHealthCheck:
+        port: 3030
+        host: ir-engine-dev-api.gcp.theinfinitereality.io
+        requestPath: /healthcheck
+  targetRef:    
+    group: ""
+    kind: Service
+    name: dev-ir-engine-api
