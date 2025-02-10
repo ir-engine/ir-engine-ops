@@ -3,6 +3,7 @@
 # Declare variables to be passed into your templates.
 
 domain: ir-engine.dev
+cloudProvider: aws 
 
 builder:
   enabled: true
