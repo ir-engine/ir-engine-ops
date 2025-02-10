@@ -110,8 +110,6 @@ spec:
               value: tcp://localhost:2376
             - name: DOCKER_TLS_VERIFY
               value: "1"
-            - name: DESTINATION_REPO_PROVIDER
-              value: {{ .Values.builder.extraEnv.DESTINATION_REPO_PROVIDER}}
             - name: GKE_NAMESPACE
               value: {{ .Release.Namespace }}
             - name: TAG
