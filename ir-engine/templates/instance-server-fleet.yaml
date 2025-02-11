@@ -102,7 +102,7 @@ spec:
                 - "--private-ip"
                 - "--structured-logs"
                 - "--port=3306"
-                - "{{ .Values.googleProjectID }}:us-central1:ir-engine-mysql-dev"
+                - "{{ .Values.googleProjectID }}:us-central1:{{ .Release.Namespace }}-mysql"
               securityContext:
                 runAsNonRoot: true
           {{- end}}               
