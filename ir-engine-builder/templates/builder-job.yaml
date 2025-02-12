@@ -167,6 +167,7 @@ spec:
 
             # Enable structured logging with LogEntry format:
             - "--structured-logs"
+            - "--auto-iam-authn"
 
             # Replace DB_PORT with the port the proxy should listen on
             - "--port=3306"            
