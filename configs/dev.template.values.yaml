@@ -451,6 +451,10 @@ batchinvalidator:
   enabled: true
   image:
     repository: <SOURCE_REPO_URL>/<SOURCE_REPO_NAME_STEM>-api
+  serviceAccount:
+    annotations: {}
+    create: true
+    name: null
   extraEnv:
     AUTH_SECRET: <INSERT_A_UUID_OR_SOMETHING_SIMILAR>
     STORAGE_PROVIDER: s3
