@@ -4,7 +4,7 @@ kind: ClusterRole
 metadata:
   name: {{ include "ir-engine.builder.fullname" . }}
   labels:
-    {{- include "ir-engine.builder.labels" . | nindent 4 }}
+    {{- include "ir-engine.builder.labels" . | nindent 4 }}  
 rules:
   - apiGroups:
       - ""
@@ -12,6 +12,11 @@ rules:
       - pods
       - endpoints
       - deployments
+      - secrets
+      - serviceaccounts
+      - configmaps
+      - clusterroles
+      - services
     verbs:
       - get
       - list
@@ -21,7 +26,7 @@ rules:
       - update
       - delete
   - apiGroups:
-      - "apps"
+      - apps
     resources:
       - deployments
     verbs:
@@ -33,7 +38,7 @@ rules:
       - update
       - delete
   - apiGroups:
-      - "agones.dev"
+      - agones.dev
     resources:
       - fleets
       - fleet
@@ -46,4 +51,37 @@ rules:
       - get
       - list
       - watch
+      - patch
+  - apiGroups:
+      - autoscaling.agones.dev
+    resources:
+      - fleetautoscalers
+    verbs:
+      - get
+      - patch
+  - apiGroups:
+      - rbac.authorization.k8s.io
+    resources:
+      - clusterroles
+      - clusterrolebindings
+    verbs:
+      - get
+      - list
+      - patch 
+  - apiGroups:
+      - batch
+    resources:
+      - cronjobs
+      - jobs
+    verbs:
+      - get
+      - patch
+      - list
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - patch
 {{- end }}

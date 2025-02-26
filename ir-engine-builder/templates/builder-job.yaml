@@ -56,7 +56,7 @@ spec:
             - name: MYSQL_PASSWORD
               value: {{ .Values.sql.password | quote }}
             - name: MYSQL_HOST
-              value: {{ .Values.sql.host | quote }}
+              value: {{ .Values.sql.host | quote }} 
             - name: MYSQL_PORT
               value: {{ .Values.sql.port | quote }}
             {{ else if .Values.mariadb }}
@@ -110,8 +110,16 @@ spec:
               value: tcp://localhost:2376
             - name: DOCKER_TLS_VERIFY
               value: "1"
+            - name: CLOUD_PROVIDER 
+              value: {{ .Values.cloudProvider }}
+            - name: NAMESPACE
+              value: {{ .Release.Namespace | default "default" }}
             - name: TAG
               value: {{ .Values.builder.image.tag }}
+            {{- if eq .Values.cloudProvider "gcp" }}
+            - name: GOOGLE_PROJECT_ID            
+              value: {{ .Values.googleProjectID }}
+            {{- end}}
           ports:
             - name: http
               containerPort: 3030
@@ -145,6 +153,36 @@ spec:
           volumeMounts:
             - name: dind-storage
               mountPath: /var/lib/docker
+      {{- if eq .Values.cloudProvider "gcp" }}
+      initContainers:
+        - name: cloud-sql-proxy
+          restartPolicy: Always
+          # It is recommended to use the latest version of the Cloud SQL Auth Proxy
+          # Make sure to update on a regular schedule!
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
+          args:
+            # If connecting from a VPC-native GKE cluster, you can use the
+            # following flag to have the proxy connect over private IP
+            - "--private-ip"
+
+            # Enable structured logging with LogEntry format:
+            - "--structured-logs"
+            - "--auto-iam-authn"
+
+            # Replace DB_PORT with the port the proxy should listen on
+            - "--port=3306"            
+            - "{{ .Values.googleProjectID }}:us-central1:{{ .Release.Namespace }}-mysql"
+
+          securityContext:
+            # The default Cloud SQL Auth Proxy image runs as the
+            # "nonroot" user and group (uid: 65532) by default.
+            runAsNonRoot: true
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1"
+      {{- end }}  
+
       volumes:
       - name: dind-storage
         emptyDir: {}
