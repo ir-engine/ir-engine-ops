@@ -10,6 +10,7 @@ rules:
       - ""
     resources:
       - pods
+      - pods/log
       - endpoints
       - deployments
       - secrets
@@ -17,13 +18,15 @@ rules:
       - configmaps
       - clusterroles
       - services
+      - jobs
+      - events
     verbs:
       - get
       - list
       - watch
       - create
-      - patch
       - update
+      - patch
       - delete
   - apiGroups:
       - apps
@@ -34,8 +37,8 @@ rules:
       - list
       - watch
       - create
-      - patch
       - update
+      - patch
       - delete
   - apiGroups:
       - agones.dev
@@ -47,18 +50,27 @@ rules:
       - gameserver
       - gameservers.agones.dev
       - gameserversets
+      - configmap
     verbs:
       - get
       - list
       - watch
+      - create
+      - update
       - patch
+      - delete
   - apiGroups:
       - autoscaling.agones.dev
     resources:
       - fleetautoscalers
     verbs:
       - get
+      - list
+      - watch
+      - create
+      - update
       - patch
+      - delete
   - apiGroups:
       - rbac.authorization.k8s.io
     resources:
@@ -67,7 +79,11 @@ rules:
     verbs:
       - get
       - list
-      - patch 
+      - watch
+      - create
+      - update
+      - patch
+      - delete
   - apiGroups:
       - batch
     resources:
@@ -75,13 +91,22 @@ rules:
       - jobs
     verbs:
       - get
-      - patch
       - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
   - apiGroups:
       - networking.k8s.io
     resources:
       - ingresses
     verbs:
       - get
+      - list
+      - watch
+      - create
+      - update
       - patch
+      - delete
 {{- end }}
