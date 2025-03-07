@@ -35,6 +35,9 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.builder.securityContext | nindent 12 }}
+            {{- if eq .Values.cloudProvider "gcp" }} 
+            privileged: true # Required to be able to kill the docker daemon process from the dind sidecar
+            {{- end }}
           image: "{{ .Values.builder.image.repository }}:{{ .Values.builder.image.tag }}"
           imagePullPolicy: {{ .Values.builder.image.pullPolicy }}
           envFrom:
