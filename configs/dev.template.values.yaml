@@ -307,13 +307,75 @@ instanceserver:
       nginx.ingress.kubernetes.io/affinity-mode: persistent
       nginx.ingress.kubernetes.io/server-snippet: |
         location ~* /primus?$ {
+          set $address '';
+        
+          rewrite_by_lua_block {
+            local mysql = require("plugins.lua_resty_mysql.main")
+            local UUID_PATTERN = "^[%daAbBcCdDeEfF-]+$"
+            local db, err = mysql:new()
+            if not db then
+              ngx.say("Failed to instantiate mysql ", err)
+              return
+            end
+
+            db:set_timeout(2000)
+
+            local ok, err, errcode, sqlstate = db:connect{
+              host = os.getenv("MYSQL_HOST"),
+              port = os.getenv("MYSQL_PORT"),
+              database = os.getenv("MYSQL_DATABASE"),
+              user = os.getenv("MYSQL_USER"),
+              password = os.getenv("MYSQL_PASSWORD"),
+              charset = "utf8"
+            }
+
+            if not ok then
+              if err then ngx.log(ngx.WARN, "db connection err " .. err) end
+              if errcode then ngx.log(ngx.WARN, "db connection errcode " .. errcode) end
+              if sqlstate then ngx.log(ngx.WARN, "db connection sqlstate " .. sqlstate) end
+              ngx.say("failed to connect: ", err, ": ", errcode, " ", sqlstate)
+              db:close()
+              return
+            end
+
+            local instanceid = ngx.unescape_uri(ngx.var.arg_instanceID)
+
+            if not string.len(instanceid) == 36 then
+              ngx.say("Invalid instanceID")
+              ngx.exit(ngx.HTTP_BAD_REQUEST)
+            end
+
+            local match = string.match(instanceid, UUID_PATTERN)
+
+            if not match then
+              ngx.say("Invalid instance ID")
+              ngx.exit(ngx.HTTP_BAD_REQUEST)
+            end
+
+            if not string.byte(instanceid, 9) == 45 or not string.byte(instanceid, 14) == 45 or not string.byte(instanceid, 19) == 45 or not string.byte(instanceid, 24) then
+              ngx.say("Invalid instanceId")
+              ngx.exit(ngx.HTTP_BAD_REQUEST)
+            end
+
+            local sql = "select id,ipAddress from instance where id = " .. ngx.quote_sql_str(instanceid) .. " and ended = 0"
+
+            local res, err, errcode, sqlstate = db:query(sql)
+
+            if not res or not res[1] then
+              ngx.say("Invalid instance ID")
+              ngx.exit(ngx.HTTP_BAD_REQUEST)
+            end
+
+            ngx.var.address = res[1].ipAddress
+          }
+        
           proxy_set_header Host $host;
           proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
           proxy_set_header X-Real-IP $remote_addr;
           proxy_http_version 1.1;
           proxy_set_header Upgrade $http_upgrade;
           proxy_set_header Connection "Upgrade";
-          proxy_pass http://$arg_address:$arg_port/primus?$args;
+          proxy_pass http://$address/primus?$args;
         }
     host: instanceserver-dev.<domain>
   resources:
