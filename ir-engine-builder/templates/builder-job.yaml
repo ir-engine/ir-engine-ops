@@ -33,6 +33,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: {{ .Chart.Name }}
+          {{ if not ((.Values.builder).kaniko).enabled }}
           securityContext:
             privileged: true # Required in some environments to be able to kill the docker daemon process from the dind sidecar
           image: "{{ .Values.builder.image.repository }}:{{ .Values.builder.image.tag }}"
@@ -44,6 +45,12 @@ spec:
           env:
             - name: KUBERNETES
               value: "true"
+            {{ if and (.Values.builder).kaniko ((.Values.builder).kaniko).enabled
+            - name: KANIKO_ENABLED
+              value: true
+            - name: KANIKO_CONTEXT_REPO
+              value: {{ .Values.builder.kaniko.context_repo }}
+            {{ end }}
             {{ if .Values.client.serveFromApi }}
             - name: SERVE_CLIENT_FROM_API
               value: "true"
