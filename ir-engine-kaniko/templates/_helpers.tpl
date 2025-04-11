@@ -29,6 +29,14 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 {{- end -}}
 
+{{- define "ir-engine.builder.fullname" -}}
+{{- if .Values.builder.fullnameOverride -}}
+{{- .Values.builder.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-builder-ir-engine-builder" .Values.release.name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "ir-engine.builder.kaniko.fullname" -}}
 {{- if .Values.builder.kaniko.fullnameOverride -}}
 {{- .Values.builder.kaniko.fullnameOverride | trunc 63 | trimSuffix "-" -}}
@@ -64,6 +72,14 @@ Selector labels
 app.kubernetes.io/name: {{ include "ir-engine.builder.kaniko.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/component: builder
+{{- end -}}
+
+{{- define "ir-engine.builder.serviceAccountName" -}}
+{{- if .Values.builder.kaniko.serviceAccount.create -}}
+    {{ default (include "ir-engine.builder.fullname" .) }}
+{{- else -}}
+    {{ default "default" .Values.builder.serviceAccount.name }}
+{{- end -}}
 {{- end -}}
 
 {{/*

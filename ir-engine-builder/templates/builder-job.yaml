@@ -36,6 +36,7 @@ spec:
           {{ if not ((.Values.builder).kaniko).enabled }}
           securityContext:
             privileged: true # Required in some environments to be able to kill the docker daemon process from the dind sidecar
+          {{ end }}
           image: "{{ .Values.builder.image.repository }}:{{ .Values.builder.image.tag }}"
           imagePullPolicy: {{ .Values.builder.image.pullPolicy }}
           envFrom:
@@ -45,9 +46,9 @@ spec:
           env:
             - name: KUBERNETES
               value: "true"
-            {{ if and (.Values.builder).kaniko ((.Values.builder).kaniko).enabled
+            {{ if and (.Values.builder).kaniko ((.Values.builder).kaniko).enabled }}
             - name: KANIKO_ENABLED
-              value: true
+              value: "true"
             - name: KANIKO_CONTEXT_REPO
               value: {{ .Values.builder.kaniko.context_repo }}
             {{ end }}
@@ -150,6 +151,7 @@ spec:
           volumeMounts:
             - name: dind-storage
               mountPath: /var/lib/docker
+        {{ if not ((.Values.builder).kaniko).enabled }}
         - name: dind
           image: docker:24.0-dind
           securityContext:
@@ -160,6 +162,7 @@ spec:
           volumeMounts:
             - name: dind-storage
               mountPath: /var/lib/docker
+        {{ end }}
       {{- if eq .Values.cloudProvider "gcp" }}
       initContainers:
         - name: cloud-sql-proxy

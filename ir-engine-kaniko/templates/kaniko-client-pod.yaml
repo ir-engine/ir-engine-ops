@@ -1,15 +1,16 @@
 {{- if and ((.Values.builder).kaniko).enabled (.Values.client).enabled -}}
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
   name: {{ include "ir-engine.builder.kaniko.fullname" . }}-client
   labels:
     {{- include "ir-engine.builder.kaniko.labels" . | nindent 4 }}
 spec:
-  replicas: 1
+  manualSelector: true
+  backoffLimit: 0
   selector:
     matchLabels:
-      {{- include "ir-engine.kaniko.selectorLabels" . | nindent 6 }}
+      {{- include "ir-engine.builder.kaniko.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
@@ -17,61 +18,68 @@ spec:
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/kaniko-configmap.yaml") . | sha256sum }}
     spec:
-    {{- with .Values.builder.kaniko.imagePullSecrets }}
+      {{- with .Values.builder.kaniko.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
-    {{- end }}
-    serviceAccountName: {{ include "ir-engine.builder.kaniko.serviceAccountName" . }}
-    securityContext:
-      {{- toYaml .Values.builder.kaniko.podSecurityContext | nindent 8 }}
-    {{- $releaseName := .Release.Name }}
-    {{ if not (empty .Values.release) }}
-    {{- $releaseName = .Values.release.name | default .Release.Name }}
-    {{ end }}
-    containers:
-      - name: {{ .Chart.Name }}-client
-        securityContext:
-          {{- toYaml .Values.builder.kaniko.securityContext | nindent 12 }}
-        image: "bitnami/kaniko:{{ .Values.builder.kaniko.image.tag }}"
-        imagePullPolicy: IfNotPresent
-        args: [
-          "--cache=true",
-          "--cache-run-layer=true",
-          "--cache-copy-layers=true",
-          {{ if eq .Values.builder.extraEnv.SERVE_CLIENT_FROM_STORAGE_PROVIDER "true" }}
-          "--dockerfile=/app/dockerfiles/client/Dockerfile-client-serve-static",
-          {{ else }}
-          "--dockerfile=/app/dockerfiles/client/Dockerfile-client",
-          {{- end }}
-          "--context=${{ .Values.builder.kaniko.bucket }}/${{ .Values.builder.kaniko.client.contextPath }}",
-          "--destination=${{ .Values.builder.extraEnv.DESTINATION_REPO_URL }}/${{ .Values.builder.extraEnv.DESTINATION_REPO_NAME }}"
-        ]
-        envFrom:
-          - configMapRef:
-              name: {{ include "ir-engine.builder.kaniko.fullname" . }}
-              optional: true
-        env:
-          - name: RELEASE_NAME
-            value: {{ $releaseName }}
-          - name: SERVICE
-            value: client
-          - name: BUILDER_REPOSITORY
-            value: {{ .Values.builder.image.repository }}
-          # GOOGLE_PROJECT_ID will be an empty string if deployed on AWS
-          - name: GOOGLE_PROJECT_ID
-            value: {{ .Values.googleProjectID }}
-          - name: NAMESPACE
-            value: {{ .Release.Namespace }}
-    {{- with .Values.builder.kaniko.nodeSelector }}
-    nodeSelector:
-      {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- with .Values.builder.kaniko.affinity }}
-    affinity:
-      {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- with .Values.builder.kaniko.tolerations }}
-    tolerations:
-      {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- end }}
+      serviceAccountName: {{ include "ir-engine.builder.kaniko.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.builder.kaniko.podSecurityContext | nindent 8 }}
+      {{- $releaseName := .Release.Name }}
+      {{ if not (empty .Values.release) }}
+      {{- $releaseName = .Values.release.name | default .Release.Name }}
+      {{ end }}
+      restartPolicy: Never
+      containers:
+        - name: {{ .Chart.Name }}-client
+          securityContext:
+            {{- toYaml .Values.builder.kaniko.securityContext | nindent 12 }}
+          image: "bitnami/kaniko:{{ .Values.builder.kaniko.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          args: [
+            "--cache=true",
+            "--cache-run-layers=true",
+            "--cache-copy-layers=true",
+            {{ if eq .Values.builder.extraEnv.SERVE_CLIENT_FROM_STORAGE_PROVIDER "true" }}
+            "--dockerfile=/app/dockerfiles/client/Dockerfile-client-serve-static",
+            {{ else }}
+            "--dockerfile=/app/dockerfiles/client/Dockerfile-client",
+            {{- end }}
+            "--context={{ .Values.builder.kaniko.context_repo }}/builder-context-{{ .Values.builder.extraEnv.START_TIME }}.tar.gz",
+            "--destination={{ .Values.builder.extraEnv.DESTINATION_REPO_URL_CLIENT }}/{{ .Values.builder.extraEnv.DESTINATION_REPO_NAME_CLIENT }}:{{ .Values.builder.extraEnv.TAG }}_{{ .Values.builder.extraEnv.START_TIME }}",
+            "--destination={{ .Values.builder.extraEnv.DESTINATION_REPO_URL_CLIENT }}/{{ .Values.builder.extraEnv.DESTINATION_REPO_NAME_CLIENT }}:latest_client"
+          ]
+          envFrom:
+            - configMapRef:
+                name: {{ include "ir-engine.builder.kaniko.fullname" . }}
+                optional: true
+          env:
+            - name: RELEASE_NAME
+              value: {{ $releaseName }}
+            - name: SERVICE
+              value: client
+            - name: BUILDER_REPOSITORY
+              value: {{ .Values.builder.image.repository }}
+            # GOOGLE_PROJECT_ID will be an empty string if deployed on AWS
+            - name: GOOGLE_PROJECT_ID
+              value: {{ .Values.googleProjectID }}
+            - name: NAMESPACE
+              value: {{ .Release.Namespace }}
+          volumeMounts:
+            - name: dockerfile-storage
+              mountPath: /app
+      volumes:
+        - name: dockerfile-storage
+      {{- with .Values.builder.kaniko.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.builder.kaniko.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.builder.kaniko.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
   {{- end }}
