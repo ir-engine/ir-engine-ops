@@ -1,0 +1,18 @@
+{{- if ((.Values.builder).kaniko).enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "ir-engine.builder.kaniko.fullname" . }}
+  labels:
+    {{- include "ir-engine.builder.kaniko.labels" . | nindent 4 }}
+data:
+{{- if .Values.instanceserver.extraEnv }}
+{{ toYaml .Values.instanceserver.extraEnv | indent 2 }}
+{{- end }}
+{{- if .Values.client.extraEnv }}
+{{ toYaml .Values.client.extraEnv | indent 2 }}
+{{- end }}
+{{- if .Values.api.extraEnv }}
+{{ toYaml .Values.api.extraEnv | indent 2 }}
+{{- end }}
+{{- end -}}

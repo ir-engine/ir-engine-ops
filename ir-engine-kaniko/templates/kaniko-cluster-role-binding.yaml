@@ -1,0 +1,16 @@
+{{- if and (.Values.builder).enabled ((.Values.builder).kaniko).enabled -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ include "ir-engine.builder.kaniko.fullname" . }}
+  labels:
+    {{- include "ir-engine.builder.kaniko.labels" . | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "ir-engine.builder.kaniko.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ include "ir-engine.builder.kaniko.fullname" . }}
+{{- end -}}

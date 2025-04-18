@@ -1,0 +1,5 @@
+Thank you for installing Infinite Reality Kaniko
+
+This service will build all enabled services with Kaniko and push
+their respective images to the specified Docker container
+storage (EKS, Docker Hub, GCR etc.)

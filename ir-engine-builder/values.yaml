@@ -11,6 +11,11 @@ cloudProvider: aws
 googleProjectID: "" 
 
 builder:
+  kaniko:
+    enabled: false
+    image:
+      tag: 1.23.2
+
   enabled: true
   name: ir-engine-builder    
 

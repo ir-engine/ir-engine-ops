@@ -1,0 +1,66 @@
+# Default values for ir-engine.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+domain: ir-engine.dev
+
+# If `cloudProvider=gcp`, initialize cloud auth proxy containers for mySQL.
+cloudProvider: aws 
+# Utilized to set the project for the mySQL cloud auth proxy. The value will be
+# set by the `deploy-ir-engine.yml` and `deploy-multi-tenancy.yml` helm upgrade steps 
+googleProjectID: "" 
+
+builder:
+  kaniko:
+    enabled: true
+    name: ir-engine-builder
+
+    replicaCount: 1
+    image:
+      repository: lagunalabs/ir-engine-builder
+      tag: latest
+      pullPolicy: IfNotPresent
+
+    imagePullSecrets: []
+    nameOverride: ""
+    fullnameOverride: ""
+
+    service:
+      type: ClusterIP
+      port: 3030
+
+    ingress:
+      enabled: false
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        # kubernetes.io/tls-acme: "true"
+      hosts:
+        - host: api.social.local
+          paths: ["/"]
+      # tls: []
+      #  - secretName: chart-example-tls
+      #    hosts:
+      #      - chart-example.local
+
+
+    serviceAccount:
+      create: true
+      annotations: {}
+      name:
+
+    resources: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+    podSecurityContext: {}
+    securityContext: {}
+
+    # Extra Environment variables to configure xrsocial
+    extraEnv:
+
+sql:
+  database: ir-engine
+  user: server
+  password: password
+  host: ""
+  port: 3306
