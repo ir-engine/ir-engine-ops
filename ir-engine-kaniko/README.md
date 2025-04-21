@@ -1,6 +1,6 @@
 # Infinite Reality Engine
 
-[Infinite Reality Engine](https://etherealengine.org/) Social Gatherings on the Web.
+[Infinite Reality Engine](https://www.theinfinitereality.com/ir-engine/) Social Gatherings on the Web.
 
 ## TL;DR
 
@@ -11,7 +11,7 @@ helm install my-release ir-engine/ir-engine
 
 ## Introduction
 
-This chart creates a [Infinite Reality Engine](https://etherealengine.org/) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+This chart creates a [Infinite Reality Engine](https://www.theinfinitereality.com/ir-engine/) deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
 [***In Progress***] This chart has been tested to work with NGINX Ingress, cert-manager, fluentd and Prometheus on top of AWS EKS.
 
