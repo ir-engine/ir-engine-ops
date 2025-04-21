@@ -1,6 +1,6 @@
 # IPFS
 
-IPFS charts for [Infinite Reality Engine](https://etherealengine.org/).
+IPFS charts for [Infinite Reality Engine](https://www.theinfinitereality.com/ir-engine/).
 
 ## Installing the Chart
 

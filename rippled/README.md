@@ -1,6 +1,6 @@
 # Rippled
 
-Rippled charts for [Infinite Reality Engine](https://etherealengine.org/).
+Rippled charts for [Infinite Reality Engine](https://www.theinfinitereality.com/ir-engine/).
 
 ## Installing the Chart
 
