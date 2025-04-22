@@ -13,7 +13,7 @@ googleProjectID: ""
 builder:
   kaniko:
     enabled: true
-    name: ir-engine-builder
+    name: ir-engine-kaniko
 
     replicaCount: 1
     image:
