@@ -119,6 +119,8 @@ spec:
               value: {{ .Values.googleProjectID }}
             - name: NAMESPACE
               value: {{ .Release.Namespace }}
+          resources:
+            {{- toYaml .Values.builder.kaniko.resources | nindent 12 }}
           volumeMounts:
             - name: client-kaniko-storage
               mountPath: /tmp
