@@ -94,7 +94,8 @@ spec:
             "--build-arg=VITE_ZENDESK_ENABLED={{ .Values.builder.extraEnv.VITE_ZENDESK_ENABLED }}",
             "--build-arg=VITE_ZENDESK_KEY={{ .Values.builder.extraEnv.VITE_ZENDESK_KEY }}",
             "--build-arg=VITE_DNS_PROVIDER={{ .Values.builder.extraEnv.VITE_DNS_PROVIDER }}",
-            "--build-arg=VITE_ZENDESK_AUTHENTICATION_ENABLED={{ .Values.builder.extraEnv.VITE_ZENDESK_AUTHENTICATION_ENABLED }}"
+            "--build-arg=VITE_ZENDESK_AUTHENTICATION_ENABLED={{ .Values.builder.extraEnv.VITE_ZENDESK_AUTHENTICATION_ENABLED }}",
+            "--build-arg=VITE_MIDDLEWARE_API_URL={{ .Values.builder.extraEnv.VITE_MIDDLEWARE_API_URL }}"
           ]
           envFrom:
             - configMapRef:
@@ -112,6 +113,8 @@ spec:
               value: {{ .Values.googleProjectID }}
             - name: NAMESPACE
               value: {{ .Release.Namespace }}
+          resources:
+            {{- toYaml .Values.builder.kaniko.resources | nindent 12 }}
           volumeMounts:
             - name: instanceserver-kaniko-storage
               mountPath: /tmp
