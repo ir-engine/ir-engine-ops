@@ -134,10 +134,11 @@ api:
     AWS_SMS_TOPIC_ARN: ""
   
   autoscaling:
-    enabled: true                        # Enable HPA (true = create HorizontalPodAutoscaler resource)
-    minReplicas: 2                       # Minimum number of pods to run
-    maxReplicas: 10                      # Maximum number of pods to run
-    targetCPUUtilizationPercentage: 75  # Target CPU usage percentage to trigger autoscaling
+    enabled: true                         # Enable HPA (true = create HorizontalPodAutoscaler resource)
+    minReplicas: 2                        # Minimum number of pods to run
+    maxReplicas: 10                       # Maximum number of pods to run
+    targetCPUUtilizationPercentage: 75    # Target CPU usage percentage to trigger autoscaling
+    targetMemoryUtilizationPercentage: 80 # Target RAM usage percentage to trigger autoscaling
 
 media:
   enabled: true
