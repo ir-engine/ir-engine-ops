@@ -39,14 +39,9 @@ client:
     enabled: true
     annotations:
       kubernetes.io/ingress.class: nginx
-      # kubernetes.io/tls-acme: "true"
     hosts:
       - host: xrsocial.local
         paths: ["/"]
-    # tls: []
-    #  - secretName: chart-example-tls
-    #    hosts:
-    #      - chart-example.local
 
   serviceAccount:
     create: true
@@ -92,15 +87,9 @@ api:
     enabled: true
     annotations:
       kubernetes.io/ingress.class: nginx
-      # kubernetes.io/tls-acme: "true"
     hosts:
       - host: api.social.local
         paths: ["/"]
-    # tls: []
-    #  - secretName: chart-example-tls
-    #    hosts:
-    #      - chart-example.local
-
 
   serviceAccount:
     create: true
@@ -115,46 +104,22 @@ api:
   securityContext: {}
 
   fileServer:
-    # This is the path of file server upload folder in your host machine. Its is required when deployed 
-    # in local environment.
-    #
-    # For MicroK8s: it will be similar to '/home/<OS_USER_NAME>/<ENGINE_FOLDER>/packages/server/upload' 
-    # or '<ENGINE_FULL_PATH>/packages/server/upload'
-    #
-    # For Minikube: it will be similar to '/hosthome/<OS_USER_NAME>/<ENGINE_FOLDER>/packages/server/upload'
-    # The folder must be in home folder and make sure to use /hosthome/ instead of home in path. 
-    # Ref: https://stackoverflow.com/a/48535001/2077741
     hostUploadFolder: ""
 
-  # Extra Environment variables to configure xrsocial
   extraEnv:
-    # ENV_VAR1: val1
-    # ENV_VAR2: val2
-
-    # automatically filled by chart.. ignore
-    # MYSQL_PORT: 3306
-    # MYSQL_DATABASE: ir-engine
-    # MYSQL_USER: server
-    # MYSQL_PASSWORD: password
-
     SMTP_HOST: ""
     SMTP_PORT: ""
     SMTP_USER: ""
     SMTP_PASS: ""
-
     GITHUB_CLIENT_ID: ""
     GITHUB_CLIENT_SECRET: ""
     GITHUB_CALLBACK_URL: http://127.0.0.1:3000/oauth/github
-
     FACEBOOK_CLIENT_ID: ""
     FACEBOOK_CLIENT_SECRET: ""
     FACEBOOK_CALLBACK_URL: http://127.0.0.1:3000/oauth/facebook
-
     GOOGLE_CLIENT_ID: ""
     GOOGLE_CLIENT_SECRET: ""
     GOOGLE_CALLBACK_URL: http://127.0.0.1:3000/oauth/google
-
-
     STORAGE_PROVIDER: local
     STORAGE_S3_BUCKET_NAME: ""
     STORAGE_S3_PUBLIC_VIDEO_PATH: "/"
@@ -163,13 +128,17 @@ api:
     STORAGE_S3_CLOUDFRONT_DOMAIN: ""
     STORAGE_AWS_ACCESS_KEY_ID: ""
     STORAGE_AWS_ACCESS_KEY_SECRET: ""
-
     AWS_SMS_REGION: ""
     AWS_SMS_ACCESS_KEY_ID: ""
     AWS_SMS_SECRET_ACCESS_KEY: ""
     AWS_SMS_TOPIC_ARN: ""
-    # SERVER_MODE: "api"
-
+  
+  autoscaling:
+    enabled: true                         # Enable HPA (true = create HorizontalPodAutoscaler resource)
+    minReplicas: 2                        # Minimum number of pods to run
+    maxReplicas: 10                       # Maximum number of pods to run
+    targetCPUUtilizationPercentage: 75    # Target CPU usage percentage to trigger autoscaling
+    targetMemoryUtilizationPercentage: 80 # Target RAM usage percentage to trigger autoscaling
 
 media:
   enabled: true
@@ -193,15 +162,9 @@ media:
     enabled: true
     annotations:
       kubernetes.io/ingress.class: nginx
-      # kubernetes.io/tls-acme: "true"
     hosts:
       - host: api.xrsocial.local
         paths: ["/video"]
-    # tls: []
-    #  - secretName: chart-example-tls
-    #    hosts:
-    #      - chart-example.local
-
 
   serviceAccount:
     create: true
@@ -215,35 +178,20 @@ media:
   podSecurityContext: {}
   securityContext: {}
 
-  # Extra Environment variables to configure xrsocial
   extraEnv:
-    # ENV_VAR1: val1
-    # ENV_VAR2: val2
-
-    # automatically filled by chart.. ignore
-    # MYSQL_PORT: 3306
-    # MYSQL_DATABASE: ir-engine
-    # MYSQL_USER: server
-    # MYSQL_PASSWORD: password
-
     SMTP_HOST: ""
     SMTP_PORT: ""
     SMTP_USER: ""
     SMTP_PASS: ""
-
     GITHUB_CLIENT_ID: ""
     GITHUB_CLIENT_SECRET: ""
     GITHUB_CALLBACK_URL: http://127.0.0.1:3000/oauth/github
-
     FACEBOOK_CLIENT_ID: ""
     FACEBOOK_CLIENT_SECRET: ""
     FACEBOOK_CALLBACK_URL: http://127.0.0.1:3000/oauth/facebook
-
     GOOGLE_CLIENT_ID: ""
     GOOGLE_CLIENT_SECRET: ""
     GOOGLE_CALLBACK_URL: http://127.0.0.1:3000/oauth/google
-
-
     STORAGE_PROVIDER: local
     STORAGE_S3_BUCKET_NAME: ""
     STORAGE_S3_PUBLIC_VIDEO_PATH: "/"
@@ -252,12 +200,10 @@ media:
     STORAGE_S3_CLOUDFRONT_DOMAIN: ""
     STORAGE_AWS_ACCESS_KEY_ID: ""
     STORAGE_AWS_ACCESS_KEY_SECRET: ""
-
     AWS_SMS_REGION: ""
     AWS_SMS_ACCESS_KEY_ID: ""
     AWS_SMS_SECRET_ACCESS_KEY: ""
     AWS_SMS_TOPIC_ARN: ""
-    # SERVER_MODE: "media"
 
 instanceserver:
   enabled: true
@@ -288,8 +234,6 @@ instanceserver:
     create: true
     annotations: {}
     name:
-
-########### Subcharts - values here will overwrite the subchart
 
 sql:
   database: ir-engine
@@ -359,3 +303,5 @@ batchinvalidator:
     create: true
     annotations: {}
     name:
+
+

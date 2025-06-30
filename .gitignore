@@ -18,3 +18,5 @@ ir-engine/Chart\.lock
 _site
 .sass-cache
 configs/beta.values.yaml
+
+.DS_STORE
