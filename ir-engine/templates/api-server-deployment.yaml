@@ -6,7 +6,6 @@ metadata:
   labels:
     {{- include "ir-engine.api.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.api.replicaCount }}
   selector:
     matchLabels:
       {{- include "ir-engine.api.selectorLabels" . | nindent 6 }}

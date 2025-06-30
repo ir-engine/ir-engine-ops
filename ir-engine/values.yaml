@@ -132,6 +132,12 @@ api:
     AWS_SMS_ACCESS_KEY_ID: ""
     AWS_SMS_SECRET_ACCESS_KEY: ""
     AWS_SMS_TOPIC_ARN: ""
+  
+  autoscaling:
+    enabled: true                        # Enable HPA (true = create HorizontalPodAutoscaler resource)
+    minReplicas: 2                       # Minimum number of pods to run
+    maxReplicas: 10                      # Maximum number of pods to run
+    targetCPUUtilizationPercentage: 75  # Target CPU usage percentage to trigger autoscaling
 
 media:
   enabled: true
@@ -297,11 +303,4 @@ batchinvalidator:
     annotations: {}
     name:
 
-# ---------------------------------------------------
-# Horizontal Pod Autoscaler (HPA) Configuration
-# ---------------------------------------------------
-autoscaling:
-  enabled: true                        # Enable HPA (true = create HorizontalPodAutoscaler resource)
-  minReplicas: 2                       # Minimum number of pods to run
-  maxReplicas: 10                      # Maximum number of pods to run
-  targetCPUUtilizationPercentage: 75  # Target CPU usage percentage to trigger autoscaling
+

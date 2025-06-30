@@ -1,27 +1,27 @@
 # This entire HPA block will only be rendered if HPA is enabled in values.yaml
-{{- if .Values.autoscaling.enabled }}
+{{- if (.Values.autoscaling).enabled }}
 
 apiVersion: autoscaling/v2  # Use HPA v2 API for advanced metrics
 kind: HorizontalPodAutoscaler  # Tells Kubernetes to create an HPA resource
 metadata:
   # Set the HPA name based on Helm's "fullname" helper (e.g., dev-ir-engine)
-  name: {{ include "ir-engine.fullname" . }}
+  name: {{ include "ir-engine.api.fullname" . }}
   labels:
     # Adds standard Helm labels from the "labels" helper
-    {{- include "ir-engine.labels" . | nindent 4 }}
+    {{- include "ir-engine.api.labels" . | nindent 4 }}
 
 spec:
   # This tells the HPA what to scale
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment  # HPA will monitor and scale this Deployment
-    name: {{ include "ir-engine.fullname" . }}  # The name of the Deployment to scale
+    name: {{ include "ir-engine.api.fullname" . }}  # The name of the Deployment to scale
 
   # Minimum number of pods to run
-  minReplicas: {{ .Values.autoscaling.minReplicas }}
+  minReplicas: {{ .Values.api.autoscaling.minReplicas }}
 
   # Maximum number of pods to allow
-  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  maxReplicas: {{ .Values.api.autoscaling.maxReplicas }}
 
   # Define the metric used to trigger scaling (here: CPU utilization)
   metrics:
@@ -30,6 +30,7 @@ spec:
         name: cpu
         target:
           type: Utilization  # We're using percentage-based CPU utilization
-          averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+          averageUtilization: {{ .Values.api.autoscaling.targetCPUUtilizationPercentage }}
+
 
 {{- end }}
