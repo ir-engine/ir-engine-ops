@@ -1,5 +1,5 @@
 # This entire HPA block will only be rendered if HPA is enabled in values.yaml
-{{- if (.Values.autoscaling).enabled }}
+{{- if ((.Values.api).autoscaling).enabled }}
 
 apiVersion: autoscaling/v2  # Use HPA v2 API for advanced metrics
 kind: HorizontalPodAutoscaler  # Tells Kubernetes to create an HPA resource
