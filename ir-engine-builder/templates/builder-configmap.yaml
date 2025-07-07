@@ -7,16 +7,32 @@ metadata:
     {{- include "ir-engine.builder.labels" . | nindent 4 }}
 data:
 {{- if .Values.builder.extraEnv }}
-{{ toYaml .Values.builder.extraEnv | indent 2 }}
+  {{- range $key, $value := .Values.builder.extraEnv }}
+    {{- if or (kindIs "string" $value) (not (hasKey $value "valueFrom")) }}
+  {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 {{- if .Values.api.extraEnv }}
-{{ toYaml .Values.api.extraEnv | indent 2 }}
+  {{- range $key, $value := .Values.api.extraEnv }}
+    {{- if or (kindIs "string" $value) (not (hasKey $value "valueFrom")) }}
+  {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 {{- if .Values.instanceserver.extraEnv }}
-{{ toYaml .Values.instanceserver.extraEnv | indent 2 }}
+  {{- range $key, $value := .Values.instanceserver.extraEnv }}
+    {{- if or (kindIs "string" $value) (not (hasKey $value "valueFrom")) }}
+  {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 {{- if .Values.client.extraEnv }}
-{{ toYaml .Values.client.extraEnv | indent 2 }}
+  {{- range $key, $value := .Values.client.extraEnv }}
+    {{- if or (kindIs "string" $value) (not (hasKey $value "valueFrom")) }}
+  {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 {{- if .Values.builder.config }}
   NODE_CONFIG: '{{ mustToJson .Values.builder.config }}'
