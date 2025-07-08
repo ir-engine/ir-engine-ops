@@ -359,3 +359,30 @@ batchinvalidator:
     create: true
     annotations: {}
     name:
+
+cloudflaresync:
+  script_location: 'scripts/sync-cloudflare.ts'
+  enabled: false
+  name: ir-engine-cloudflaresync
+
+  replicaCount: 1
+  image:
+    repository: ir-engine/ir-engine-dev
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  imagePullSecrets: []
+  nameOverride: ""
+  fullnameOverride: ""
+
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  podSecurityContext: {}
+  securityContext: {}
+
+  serviceAccount:
+    create: true
+    annotations: {}
+    name:
