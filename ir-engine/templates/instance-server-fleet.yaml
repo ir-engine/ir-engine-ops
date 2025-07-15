@@ -106,7 +106,7 @@ spec:
                 - "{{ .Values.googleProjectID }}:us-central1:{{ .Release.Namespace }}-mysql"
               securityContext:
                 runAsNonRoot: true
-          {{- end}}               
+          {{- end}}
             - name: {{ include "ir-engine.instanceserver.fullname" . }}
               image: "{{ .Values.instanceserver.image.repository }}:{{ .Values.instanceserver.image.tag }}"
               imagePullPolicy: {{ .Values.instanceserver.image.pullPolicy }}

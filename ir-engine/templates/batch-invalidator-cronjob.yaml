@@ -17,7 +17,7 @@ spec:
           {{- if eq .Values.cloudProvider "gcp" }}
           initContainers:
             - name: cloud-sql-proxy
-              restartPolicy: Always # Indicates a special type of sidecar, which will last for the entire lifecycle of the pod 
+              restartPolicy: Always # Indicates a special type of sidecar, which will last for the entire lifecycle of the pod
               image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
               args:
                 - "--private-ip"
