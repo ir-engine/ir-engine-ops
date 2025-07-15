@@ -96,7 +96,7 @@ spec:
           {{ end }}
           containers:
           {{- if eq .Values.cloudProvider "gcp" }}
-            - name: cloud-sql-proxy-mysql
+            - name: cloud-sql-proxy
               image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
               args:
                 - "--private-ip"
@@ -106,18 +106,6 @@ spec:
                 - "{{ .Values.googleProjectID }}:us-central1:{{ .Release.Namespace }}-mysql"
               securityContext:
                 runAsNonRoot: true
-            {{- if .Values.vectordb.enabled }}
-            - name: cloud-sql-proxy-postgres
-              image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
-              args:
-                - "--private-ip"
-                - "--structured-logs"
-                - "--port=5432"
-                - "--auto-iam-authn"
-                - "{{ .Values.googleProjectID }}:us-central1:{{ .Release.Namespace }}-postgres"
-              securityContext:
-                runAsNonRoot: true
-            {{- end}}
           {{- end}}
             - name: {{ include "ir-engine.instanceserver.fullname" . }}
               image: "{{ .Values.instanceserver.image.repository }}:{{ .Values.instanceserver.image.tag }}"

@@ -16,7 +16,7 @@ spec:
           serviceAccountName: {{ include "ir-engine.batchinvalidator.serviceAccountName" . }}
           {{- if eq .Values.cloudProvider "gcp" }}
           initContainers:
-            - name: cloud-sql-proxy-mysql
+            - name: cloud-sql-proxy
               restartPolicy: Always # Indicates a special type of sidecar, which will last for the entire lifecycle of the pod
               image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
               args:
@@ -27,19 +27,6 @@ spec:
                 - "{{ .Values.googleProjectID }}:us-central1:{{ .Release.Namespace }}-mysql"
               securityContext:
                 runAsNonRoot: true
-            {{- if .Values.vectordb.enabled }}
-            - name: cloud-sql-proxy-postgres
-              restartPolicy: Always # Indicates a special type of sidecar, which will last for the entire lifecycle of the pod
-              image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
-              args:
-                - "--private-ip"
-                - "--structured-logs"
-                - "--port=5432"
-                - "--auto-iam-authn"
-                - "{{ .Values.googleProjectID }}:us-central1:{{ .Release.Namespace }}-postgres"
-              securityContext:
-                runAsNonRoot: true
-            {{- end}}
           {{- end}}
           containers:              
             - name: batch-invalidator
