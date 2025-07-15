@@ -101,6 +101,14 @@ spec:
                   key: redis-password
             - name: RELEASE_NAME
               value: {{ $releaseName }}
+            # Handle secret references from taskserver.extraEnv
+            {{- range $key, $value := .Values.taskserver.extraEnv }}
+            {{- if and (kindIs "map" $value) (hasKey $value "valueFrom") }}
+            - name: {{ $key }}
+              valueFrom:
+                {{- toYaml $value.valueFrom | nindent 16 }}
+            {{- end }}
+            {{- end }}
           ports:
             - name: http
               containerPort: 3030

@@ -7,7 +7,11 @@ metadata:
     {{- include "ir-engine.media.labels" . | nindent 4 }}
 data:
 {{- if .Values.media.extraEnv }}
-{{ toYaml .Values.media.extraEnv | indent 2 }}
+  {{- range $key, $value := .Values.media.extraEnv }}
+    {{- if or (kindIs "string" $value) (not (hasKey $value "valueFrom")) }}
+  {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 {{- if .Values.media.config }}
   NODE_CONFIG: '{{ mustToJson .Values.media.config }}'

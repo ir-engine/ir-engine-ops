@@ -111,7 +111,15 @@ spec:
             - name: GOOGLE_PROJECT_ID
               value: {{ .Values.googleProjectID }}         
             - name: NAMESPACE
-              value: {{ .Release.Namespace }}                 
+              value: {{ .Release.Namespace }}
+            # Handle secret references from api.extraEnv
+            {{- range $key, $value := .Values.api.extraEnv }}
+            {{- if and (kindIs "map" $value) (hasKey $value "valueFrom") }}
+            - name: {{ $key }}
+              valueFrom:
+                {{- toYaml $value.valueFrom | nindent 16 }}
+            {{- end }}
+            {{- end }}
           ports:
             - name: api-http
               containerPort: 3030

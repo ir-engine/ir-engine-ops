@@ -7,6 +7,10 @@ metadata:
     {{- include "ir-engine.batchinvalidator.labels" . | nindent 4 }}
 data:
 {{- if .Values.batchinvalidator.extraEnv }}
-{{ toYaml .Values.batchinvalidator.extraEnv | indent 2 }}
+  {{- range $key, $value := .Values.batchinvalidator.extraEnv }}
+    {{- if or (kindIs "string" $value) (not (hasKey $value "valueFrom")) }}
+  {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 {{- end -}}
