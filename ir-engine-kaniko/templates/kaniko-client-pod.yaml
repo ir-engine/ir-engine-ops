@@ -129,7 +129,7 @@ spec:
 
       {{- if eq .Values.cloudProvider "gcp" }}
       initContainers:
-        - name: cloud-sql-proxy
+        - name: cloud-sql-proxy-mysql
           restartPolicy: Always
           # It is recommended to use the latest version of the Cloud SQL Auth Proxy
           # Make sure to update on a regular schedule!
@@ -155,6 +155,34 @@ spec:
             requests:
               memory: "2Gi"
               cpu: "1"
+        {{- if .Values.vectordb.enabled }}
+        - name: cloud-sql-proxy-postgres
+          restartPolicy: Always
+          # It is recommended to use the latest version of the Cloud SQL Auth Proxy
+          # Make sure to update on a regular schedule!
+          image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
+          args:
+            # If connecting from a VPC-native GKE cluster, you can use the
+            # following flag to have the proxy connect over private IP
+            - "--private-ip"
+
+            # Enable structured logging with LogEntry format:
+            - "--structured-logs"
+            - "--auto-iam-authn"
+
+            # Replace DB_PORT with the port the proxy should listen on
+            - "--port=5432"
+            - "{{ .Values.googleProjectID }}:us-central1:{{ .Release.Namespace }}-postgres"
+
+          securityContext:
+            # The default Cloud SQL Auth Proxy image runs as the
+            # "nonroot" user and group (uid: 65532) by default.
+            runAsNonRoot: true
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1"
+        {{- end}}
       {{- end }}
       volumes:
         - name: client-kaniko-storage
