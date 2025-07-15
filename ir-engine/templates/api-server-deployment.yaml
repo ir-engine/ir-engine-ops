@@ -181,7 +181,7 @@ spec:
             - "{{ .Values.googleProjectID }}:us-central1:{{ .Release.Namespace }}-mysql"
           securityContext:
             runAsNonRoot: true
-        {{- if .Values.vectordb.enabled }}
+        {{- if (.Values.vectordb).enabled }}
         - name: cloud-sql-proxy-postgres
           restartPolicy: Always # Indicates a special type of sidecar, which will last for the entire lifecycle of the pod
           image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
