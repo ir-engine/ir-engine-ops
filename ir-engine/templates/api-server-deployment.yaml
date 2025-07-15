@@ -43,6 +43,10 @@ spec:
               value: "api"
             - name: KUBERNETES
               value: "true"
+            {{- if (.Values.vectordb).enabled }}
+            - name: VECTORDB_ENABLED
+              value: "true"
+            {{- end }}
             {{ if .Values.client.serveFromApi }}
             - name: SERVE_CLIENT_FROM_API
               value: "true"
