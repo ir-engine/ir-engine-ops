@@ -103,7 +103,10 @@ spec:
             "--build-arg=VITE_ZENDESK_KEY={{ .Values.builder.extraEnv.VITE_ZENDESK_KEY }}",
             "--build-arg=VITE_DNS_PROVIDER={{ .Values.builder.extraEnv.VITE_DNS_PROVIDER }}",
             "--build-arg=VITE_ZENDESK_AUTHENTICATION_ENABLED={{ .Values.builder.extraEnv.VITE_ZENDESK_AUTHENTICATION_ENABLED }}",
-            "--build-arg=VITE_MIDDLEWARE_API_URL={{ .Values.builder.extraEnv.VITE_MIDDLEWARE_API_URL }}"
+            "            "--build-arg=VITE_MIDDLEWARE_API_URL={{ .Values.builder.extraEnv.VITE_MIDDLEWARE_API_URL }}",
+            {{- if (.Values.vectordb).enabled }}
+            "--build-arg=VITE_VECTORDB_ENABLED={{ (.Values.vectordb).enabled }}"
+            {{- end }}"
           ]
           envFrom:
             - configMapRef:

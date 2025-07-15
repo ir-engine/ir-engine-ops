@@ -46,6 +46,10 @@ spec:
           env:
             - name: KUBERNETES
               value: "true"
+            {{- if (.Values.vectordb).enabled }}
+            - name: VECTORDB_ENABLED
+              value: "true"
+            {{- end }}
             {{ if .Values.client.serveFromApi }}
             - name: SERVE_CLIENT_FROM_API
               value: "true"
@@ -185,7 +189,7 @@ spec:
             requests:
               memory: "2Gi"
               cpu: "1"
-        {{- if .Values.vectordb.enabled }}
+        {{- if (.Values.vectordb).enabled }}
         - name: cloud-sql-proxy-postgres
           restartPolicy: Always
           # It is recommended to use the latest version of the Cloud SQL Auth Proxy
