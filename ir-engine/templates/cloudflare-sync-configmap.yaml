@@ -1,0 +1,12 @@
+{{- if (.Values.cloudflaresync).enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "ir-engine.cloudflaresync.fullname" . }}
+  labels:
+    {{- include "ir-engine.cloudflaresync.labels" . | nindent 4 }}
+data:
+{{- if .Values.cloudflaresync.extraEnv }}
+{{ toYaml .Values.cloudflaresync.extraEnv | indent 2 }}
+{{- end }}
+{{- end -}}

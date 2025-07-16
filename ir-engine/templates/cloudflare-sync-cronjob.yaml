@@ -1,0 +1,79 @@
+{{- if (.Values.cloudflaresync).enabled -}}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name:  {{ template "ir-engine.cloudflaresync.fullname" . }}
+spec:
+  schedule: "* * * * *"  # Run every minute
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      parallelism: 1
+      template:
+        spec:
+          serviceAccountName: {{ include "ir-engine.cloudflaresync.serviceAccountName" . }}
+          {{- if eq .Values.cloudProvider "gcp" }}
+          initContainers:
+            - name: cloud-sql-proxy
+              restartPolicy: Always # Indicates a special type of sidecar, which will last for the entire lifecycle of the pod
+              image: gcr.io/cloud-sql-connectors/cloud-sql-proxy:2.14.1
+              args:
+                - "--private-ip"
+                - "--structured-logs"
+                - "--port=3306"
+                - "--auto-iam-authn"
+                - "{{ .Values.googleProjectID }}:us-central1:{{ .Release.Namespace }}-mysql"
+              securityContext:
+                runAsNonRoot: true
+          {{- end}}
+          containers:              
+            - name: cloudflare-sync
+              image: "{{ .Values.cloudflaresync.image.repository }}:{{ .Values.cloudflaresync.image.tag }}"
+              envFrom:
+                - configMapRef:
+                    name: {{ include "ir-engine.cloudflaresync.fullname" . }}
+                    optional: true
+              env:
+                - name: SERVER_MODE
+                  value: "api"
+                - name: KUBERNETES
+                  value: "true"
+                {{ if .Values.sql }}
+                - name: MYSQL_USER
+                  value: {{ .Values.sql.user }}
+                - name: MYSQL_DATABASE
+                  value: {{ .Values.sql.database }}
+                - name: MYSQL_PASSWORD
+                  value: {{ .Values.sql.password | quote }}
+                - name: MYSQL_HOST
+                  value: {{ .Values.sql.host | quote }}
+                - name: MYSQL_PORT
+                  value: {{ .Values.sql.port | quote }}
+                {{ else }}
+                - name: MYSQL_USER
+                  value: server
+                - name: MYSQL_DATABASE
+                  value: ir-engine
+                - name: MYSQL_PASSWORD
+                  value: password
+                - name: MYSQL_HOST
+                  value: host.minikube.internal
+                - name: MYSQL_PORT
+                  value: 3306
+                {{ end }}
+                # GOOGLE_PROJECT_ID will be an empty string if deployed on AWS
+                - name: GOOGLE_PROJECT_ID
+                  value: {{ .Values.googleProjectID }}
+                - name: NAMESPACE
+                  value: {{ .Release.Namespace }}                           
+              command: [
+                'npx',
+                'cross-env',
+                'ts-node',
+                '--swc',
+                "{{ .Values.cloudflaresync.script_location }}"
+              ]
+          restartPolicy: Never
+{{- end }}

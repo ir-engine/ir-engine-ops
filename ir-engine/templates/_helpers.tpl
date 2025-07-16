@@ -34,6 +34,10 @@ Expand the name of the chart.
 {{- default .Chart.Name .Values.batchinvalidator.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{- define "ir-engine.cloudflaresync.name" -}}
+{{- default .Chart.Name .Values.cloudflaresync.nameOverride | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
 
 {{/*
 Create a default fully qualified app name.
@@ -111,6 +115,14 @@ If release name contains chart name it will be used as a full name.
 {{- .Values.batchinvalidator.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
 {{- printf "%s-%s" .Release.Name .Values.batchinvalidator.name | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "ir-engine.cloudflaresync.fullname" -}}
+{{- if .Values.cloudflaresync.fullnameOverride -}}
+{{- .Values.cloudflaresync.fullnameOverride | trunc 63 | trimSuffix "-" -}}
+{{- else -}}
+{{- printf "%s-%s" .Release.Name .Values.cloudflaresync.name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 {{- end -}}
 
@@ -282,6 +294,27 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/component: batchinvalidator
 {{- end -}}
 
+{{/*
+Common labels
+*/}}
+{{- define "ir-engine.cloudflaresync.labels" -}}
+helm.sh/chart: {{ include "ir-engine.chart" . }}
+{{ include "ir-engine.cloudflaresync.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{/*
+Selector labels
+*/}}
+{{- define "ir-engine.cloudflaresync.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "ir-engine.cloudflaresync.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+app.kubernetes.io/component: cloudflaresync
+{{- end -}}
+
 
 {{/*
 Create the name of the service account to use
@@ -360,6 +393,17 @@ Create the name of the service account to use for batchinvalidator
     {{ default (include "ir-engine.batchinvalidator.fullname" .) .Values.batchinvalidator.serviceAccount.name }}
 {{- else -}}
     {{ default "default" .Values.batchinvalidator.serviceAccount.name }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create the name of the service account to use for cloudflaresync
+*/}}
+{{- define "ir-engine.cloudflaresync.serviceAccountName" -}}
+{{- if .Values.cloudflaresync.serviceAccount.create -}}
+    {{ default (include "ir-engine.cloudflaresync.fullname" .) .Values.cloudflaresync.serviceAccount.name }}
+{{- else -}}
+    {{ default "default" .Values.cloudflaresync.serviceAccount.name }}
 {{- end -}}
 {{- end -}}
 
