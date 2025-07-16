@@ -43,10 +43,9 @@ spec:
               value: "api"
             - name: KUBERNETES
               value: "true"
-            {{- if (.Values.vectordb).enabled }}
+            {{- if and .Values.vectordb (.Values.vectordb).enabled }}
             - name: VECTORDB_ENABLED
               value: "true"
-            {{- if .Values.vectordb }}
             - name: POSTGRES_USER
               value: {{ .Values.vectordb.user }}
             - name: POSTGRES_DATABASE
@@ -57,7 +56,9 @@ spec:
               value: {{ .Values.vectordb.host | quote }}
             - name: POSTGRES_PORT
               value: {{ .Values.vectordb.port | quote }}
-            {{- else if eq .Values.cloudProvider "gcp" }}
+            {{- else if and (eq .Values.cloudProvider "gcp") (.Values.vectordb) (.Values.vectordb).enabled }}
+            - name: VECTORDB_ENABLED
+              value: "true"
             - name: POSTGRES_USER
               value: "ir-engine-sa@{{ .Values.googleProjectID }}.iam"
             - name: POSTGRES_DATABASE
@@ -68,18 +69,6 @@ spec:
               value: "127.0.0.1"
             - name: POSTGRES_PORT
               value: "5432"
-            {{- else }}
-            - name: POSTGRES_USER
-              value: postgres
-            - name: POSTGRES_DATABASE
-              value: vector-db
-            - name: POSTGRES_PASSWORD
-              value: postgres
-            - name: POSTGRES_HOST
-              value: host.minikube.internal
-            - name: POSTGRES_PORT
-              value: 5432
-            {{- end }}
             {{- end }}
             {{ if .Values.client.serveFromApi }}
             - name: SERVE_CLIENT_FROM_API
