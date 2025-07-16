@@ -359,3 +359,6 @@ batchinvalidator:
     create: true
     annotations: {}
     name:
+
+vectordb:
+  enabled: false
